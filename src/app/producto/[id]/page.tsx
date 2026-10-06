@@ -1,7 +1,7 @@
-import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { getProduct, imageUrl } from '@/lib/api';
+import { getProduct } from '@/lib/api';
 import AddToCartBox from '@/components/AddToCartBox';
+import ProductGallery from '@/components/ProductGallery';
 
 function money(v: string | number) {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(Number(v));
@@ -11,29 +11,9 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
   const product = await getProduct(params.id).catch(() => null);
   if (!product) return notFound();
 
-  const images = product.images.length ? product.images : [];
-  const primary = images.find((i) => i.isPrimary) ?? images[0];
-
   return (
     <div className="grid gap-10 md:grid-cols-2">
-      <div>
-        <div className="relative aspect-square overflow-hidden rounded-2xl bg-gray-100">
-          {primary ? (
-            <Image src={imageUrl(primary.url)} alt={product.name} fill className="object-cover" />
-          ) : (
-            <div className="flex h-full items-center justify-center text-6xl">📷</div>
-          )}
-        </div>
-        {images.length > 1 && (
-          <div className="mt-3 flex gap-2">
-            {images.map((img) => (
-              <div key={img.id} className="relative h-16 w-16 overflow-hidden rounded-lg bg-gray-100">
-                <Image src={imageUrl(img.url)} alt="" fill className="object-cover" />
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      <ProductGallery images={product.images} alt={product.name} />
 
       <div>
         <span className="text-xs font-semibold uppercase tracking-wide text-brand-500">
